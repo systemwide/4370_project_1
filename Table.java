@@ -176,7 +176,28 @@ public class Table
 
         List <Comparable []> rows = new ArrayList <> ();
 
-        //  T O   B E   I M P L E M E N T E D 
+        /**Our implementation of select (part1) starts here 
+        *
+        */
+        int index;
+       
+        for(Comparable[] t : tuples)
+        {
+            for(index =0; index < t.length; index++)
+            {
+                
+                KeyType tempKey = new KeyType(t[index].toString());
+            
+                // For each element, make an equivalent KeyType, and use the 
+                // KeyType method .equals() to compare it to keyVal
+                
+                if(keyVal.equals(tempKey))
+                
+                    rows.add(t);
+            }
+   
+        }          
+        
 
         return new Table (name + count++, attribute, domain, key, rows);
     } // select
