@@ -141,7 +141,22 @@ public class Table
 
         List <Comparable []> rows = new ArrayList <> ();
 
-        //  T O   B E   I M P L E M E N T E D 
+        //Our code
+        int index;
+        for (Comparable[] tuple : this.tuples) {
+            Comparable[] addition = new Comparable[attrs.length];
+            index = 0;
+            for (int i = 0; i < this.attribute.length; i++) {
+                for (String atr : attrs) {
+                    if(atr.equals(attribute[i])){
+                        addition[index] = tuple[i];
+                        index++;
+                    }
+                }
+            }
+            rows.add(addition);
+        }
+        //Our code
 
         return new Table (name + count++, attrs, colDomain, newKey, rows);
     } // project
@@ -287,11 +302,94 @@ public class Table
 
         List <Comparable []> rows = new ArrayList <> ();
 
-        //  T O   B E   I M P L E M E N T E D 
+        //our code
+        HashSet<String> attrs = new HashSet<>();    //hashset of attributes
+        HashSet<String> overlap = new HashSet<>();    //hashset of overlapping attributes
+        for (String attr : this.attribute) attrs.add(attr);     //adding attrs from this table
+        for (String attr : table2.attribute){//only attrs from table2 not included in this will be added here.
+            if(attrs.contains(attr)){
+                overlap.add(attr);
+            }else{
+                attrs.add(attr);
+            }
+        }
 
-        // FIX - eliminate duplicate columns
-        return new Table (name + count++, ArrayUtil.concat (attribute, table2.attribute),
-                                          ArrayUtil.concat (domain, table2.domain), key, rows);
+
+        Table shorter = (this.tuples.size() < table2.tuples.size()) ? this : table2;
+        Table longer = (this.tuples.size() >= table2.tuples.size()) ? this : table2;
+
+        Map<String, Comparable> overlapMap;
+
+        int index;
+        for(Comparable[] tuple : shorter.tuples) {
+
+            overlapMap = new HashMap<>(overlap.size());
+            for (int i = 0; i < this.attribute.length; i++) {//store overlapping attributes
+                if(overlap.contains(this.attribute[i])) overlapMap.put(this.attribute[i], tuple[i]);
+            }
+            Comparable[] tuple2 = new Comparable[0];
+            Boolean found = false;
+            for (Comparable[] tuple_2 : longer.tuples) {
+                found = true;
+                for (int i = 0; i < tuple_2.length; i++) {
+                    //for each attribute, if there is an overlap but the values don't match, then this isn't a match.
+                    if(overlap.contains(longer.attribute[i]) && !tuple_2[i].equals(overlapMap.get(this.attribute[i]))) found = false;
+                }
+                if(found){
+                    tuple2 = tuple_2;
+                    break;
+                }
+            }
+
+            //if this tuple doesn't have a match in the other table, don't include it in the joined table.
+            if(!found) break;
+
+            Comparable[] addition = new Comparable[attrs.size()];
+            index = 0;
+            for (int i = 0; i < tuple.length; i++) {
+                addition[index] = tuple[i];
+                index++;
+            }
+            for (int i = 0; i < tuple2.length && index < attrs.size(); i++) {
+                addition[index] = tuple2[i];
+                index++;
+            }
+            rows.add(addition);
+        }
+
+        //new attributes and domains
+        String[] attributes = new String[attrs.size()];
+        Class[] domains = new Class[attrs.size()];
+
+        index = 0;
+        boolean domainFound;
+        for (String attr : attrs) {
+            domainFound = false;
+            attributes[index] = attr;
+
+            //checking for domain in first table
+            for (int i = 0; i < this.attribute.length; i++) {
+                if(this.attribute[i].equals(attr)){
+                    domains[index] = this.domain[i];
+                    domainFound = true;
+                    break;
+                }
+            }
+            if(!domainFound) {
+                //if domain wasn't found in first table, then find it in second.
+                for (int i = 0; i < table2.attribute.length; i++) {
+                    if (table2.attribute[i].equals(attr)) {
+                        domains[index] = table2.domain[i];
+                        break;
+                    }
+                }
+            }
+            index++;
+        }
+        //our code
+
+        //changed to attributes and domains below from the concatinations.
+        return new Table (name + count++, attributes, domains, key, rows);
     } // join
 
     /************************************************************************************
