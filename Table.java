@@ -605,7 +605,7 @@ public class Table
     } // extract
 
     /************************************************************************************
-     * Layton, Ben Rotolo, and Jeff Cardinal's code
+     * Layton Hayes, Ben Rotolo, and Jeff Cardinal's code
      * Check the size of the tuple (number of elements in list) as well as the type of
      * each value to ensure it is from the right domain. 
      *
