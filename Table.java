@@ -182,7 +182,7 @@ public class Table
         int index;
        
         for(Comparable[] t : tuples) {
-        	
+            
             for(index =0; index < t.length; index++) {
                 
                 KeyType tempKey = new KeyType(t[index].toString());
@@ -201,6 +201,7 @@ public class Table
     } // select
 
     /************************************************************************************
+     * Zach Saucier's code
      * Union this table and table2.  Check that the two tables are compatible.
      *
      * #usage movie.union (show)
@@ -214,8 +215,47 @@ public class Table
         if (! compatible (table2)) return null;
 
         List <Comparable []> rows = new ArrayList <> ();
-
-        //  T O   B E   I M P L E M E N T E D 
+        
+        // Add the whole first table to the new table
+        for (Comparable[] tuple : this.tuples) {
+            rows.add(tuple);
+        } 
+        
+        // Add values from the second table that don't match a tuple in this table
+        for (Comparable[] tuple : table2.tuples) {
+            Comparable[] addition = new Comparable[tuple.length]; //Temp array for row addition
+            Boolean flag = FALSE; //If FALSE, add the row
+            
+            //Parse all tuples and add them into an ArrayList for later processing
+            ArrayList<String> tempRow = new ArrayList<String>();
+            for (int j=0; j<tuple.length; j++) {
+                tempRow.add(tuple[j].toString());
+            } // for
+            
+            //For each tuple in table1 parse the fields and change them to String objects,
+            //add them to a temporary Comparable[] and check for matches in table1
+            for (Comparable[] tuple2 : this.tuples) {
+                
+                ArrayList<String> tempRow2 = new ArrayList<String>();
+                for (int j=0; j<tuple2.length; j++) {
+                    tempRow2.add(tuple2[j].toString()); //Add in each field with .toString()
+                } // for
+            
+                //Checks for matches. If there's a match we set the flag to be FALSE 
+                //and we won't add it into the final output table
+                if (tempRow.equals(tempRow2)) { 
+                    flag = TRUE;
+                } // if
+                
+            } // for
+            
+            //If flag remains TRUE, add the row into the table
+            if (flag == FALSE) {
+                addition = tuple;
+                rows.add(addition); 
+            } // if
+            
+        } // for
 
         return new Table (name + count++, attribute, domain, key, rows);
     } // union
@@ -239,39 +279,39 @@ public class Table
 
         //For every tuple in table1 go through and check for matches in table2
         for (Comparable[] tuple : this.tuples) {
-        	
-        	Comparable[] addition = new Comparable[tuple.length]; //Temp array for row addition
-        	Boolean flag = TRUE; //If TRUE, add the row
-        	
-        	//Parse all tuples and add them into an ArrayList for later processing
-        	ArrayList<String> tempRow = new ArrayList<String>();
-    		for (int j=0; j<tuple.length; j++) {
-    			tempRow.add(tuple[j].toString());
-        	} // for
-    		
-    		//For each tuple in table2 parse the fields and change them to String objects,
-    		//add them to a temporary Comparable[] and check for matches in table1
-        	for (Comparable[] tuple2 : table2.tuples) {
-        		
-        		ArrayList<String> tempRow2 = new ArrayList<String>();
-        		for (int j=0; j<tuple2.length; j++) {
-        			tempRow2.add(tuple2[j].toString()); //Add in each field with .toString()
-            	} // for
-        	
-        		//Checks for matches. If there's a match we set the flag to be FALSE 
-        		//and we won't add it into the final output table
-        		if (tempRow.equals(tempRow2)) { 
-        			flag = FALSE;
-        		} // if
-        		
-        	} // for
-        	
-        	//If flag remains TRUE, add the row into the table
-        	if (flag == TRUE) {
-    			addition = tuple;
-    			rows.add(addition);	
-    		} // if
-        	
+            
+            Comparable[] addition = new Comparable[tuple.length]; //Temp array for row addition
+            Boolean flag = TRUE; //If TRUE, add the row
+            
+            //Parse all tuples and add them into an ArrayList for later processing
+            ArrayList<String> tempRow = new ArrayList<String>();
+            for (int j=0; j<tuple.length; j++) {
+                tempRow.add(tuple[j].toString());
+            } // for
+            
+            //For each tuple in table2 parse the fields and change them to String objects,
+            //add them to a temporary Comparable[] and check for matches in table1
+            for (Comparable[] tuple2 : table2.tuples) {
+                
+                ArrayList<String> tempRow2 = new ArrayList<String>();
+                for (int j=0; j<tuple2.length; j++) {
+                    tempRow2.add(tuple2[j].toString()); //Add in each field with .toString()
+                } // for
+            
+                //Checks for matches. If there's a match we set the flag to be FALSE 
+                //and we won't add it into the final output table
+                if (tempRow.equals(tempRow2)) { 
+                    flag = FALSE;
+                } // if
+                
+            } // for
+            
+            //If flag remains TRUE, add the row into the table
+            if (flag == TRUE) {
+                addition = tuple;
+                rows.add(addition); 
+            } // if
+            
         } // for
         
         return new Table (name + count++, attribute, domain, key, rows);
@@ -616,18 +656,18 @@ public class Table
     private boolean typeCheck (Comparable [] t)
     { 
 
-    	 if(t.length != this.domain.length) // first check relative size of tuples
+         if(t.length != this.domain.length) // first check relative size of tuples
          {
              return false;
              //break;
          }
-    	
-    	 for(int i = 0; i < t.length; i++){
-    		 if(!t[i].getClass().equals(this.domain[i])){
-    			 return false;
-    			 //break
-    		 }
-    	 }
+        
+         for(int i = 0; i < t.length; i++){
+             if(!t[i].getClass().equals(this.domain[i])){
+                 return false;
+                 //break
+             }
+         }
 
         return true;
     }
