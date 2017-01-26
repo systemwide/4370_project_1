@@ -253,8 +253,73 @@ public class Table
 
         List <Comparable []> rows = new ArrayList <> ();
 
-        //  T O   B E   I M P L E M E N T E D 
-
+        //For every tuple in table1 go through and check for matches in table2
+        for (Comparable[] tuple : this.tuples) {
+        	
+        	Comparable[] addition = new Comparable[tuple.length]; //Temp array for row addition
+        	Boolean flag = TRUE; //If TRUE, add the row
+        	
+        	//Parse all tuples and add them into an ArrayList for later processing
+        	ArrayList<String> tempRow = new ArrayList<String>();
+    		for (int j=0; j<tuple.length; j++) {
+    			tempRow.add(tuple[j].toString());
+        	} // for
+    		
+    		//For each tuple in table2 parse the fields and change them to String objects,
+    		//add them to a temporary Comparable[] and check for matches in table1
+        	for (Comparable[] tuple2 : table2.tuples) {
+        		
+        		ArrayList<String> tempRow2 = new ArrayList<String>();
+        		for (int j=0; j<tuple2.length; j++) {
+        			tempRow2.add(tuple2[j].toString()); //Add in each field with .toString()
+            	} // for
+        	
+        		//Checks for matches. If there's a match we set the flag to be FALSE 
+        		//and we won't add it into the final output table
+        		if (tempRow.equals(tempRow2)) { 
+        			flag = FALSE;
+        		} // if
+        		
+        	} // for
+        	
+        	//If flag remains TRUE, add the row into the table
+        	if (flag == TRUE) {
+    			addition = tuple;
+    			rows.add(addition);	
+    		} // if
+        	
+        } // for
+        
+        return new Table (name + count++, attribute, domain, key, rows);
+    } // minus
+    		for (int j=0; j<tuple.length; j++) {
+    			tempRow.add(tuple[j].toString());
+        	}//for
+    		
+    		//For each tuple in table2 parse the fields and change them to String objects,
+    		//add them to a temporary Comparable[] and check for matches in table1
+        	for (Comparable[] tuple2 : table2.tuples) {
+        		
+        		ArrayList<String> tempRow2 = new ArrayList<String>();
+        		for (int j=0; j<tuple2.length; j++) {
+        			tempRow2.add(tuple2[j].toString()); //Add in each field with .toString()
+            	}//for
+        	
+        		//Checks for matches
+        		if (tempRow.equals(tempRow2)) { 
+        			flag = FALSE;
+        		}//if
+        		
+        	}//for
+        	
+        	//If there's a match, add it to the rows
+        	if (flag == TRUE) {
+    			addition = tuple;
+    			rows.add(addition);	
+    		}//if
+        	
+        }//for
+        
         return new Table (name + count++, attribute, domain, key, rows);
     } // minus
 
