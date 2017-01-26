@@ -80,8 +80,8 @@ public class Table
         domain    = _domain;
         key       = _key;
         tuples    = new ArrayList <> ();
-//      index     = new TreeMap <> ();       // also try BPTreeMap, LinHashMap or ExtHashMap
-        index     = new LinHashMap <> (KeyType.class, Comparable [].class);
+        index     = new TreeMap <> ();       // also try BPTreeMap, LinHashMap or ExtHashMap
+        //index     = new LinHashMap <> (KeyType.class, Comparable [].class);
 
     } // constructor
 
@@ -141,22 +141,7 @@ public class Table
 
         List <Comparable []> rows = new ArrayList <> ();
 
-        //Our code
-        int index;
-        for (Comparable[] tuple : this.tuples) {
-            Comparable[] addition = new Comparable[attrs.length];
-            index = 0;
-            for (int i = 0; i < this.attribute.length; i++) {
-                for (String atr : attrs) {
-                    if(atr.equals(attribute[i])){
-                        addition[index] = tuple[i];
-                        index++;
-                    }
-                }
-            }
-            rows.add(addition);
-        }
-        //Our code
+        //  T O   B E   I M P L E M E N T E D 
 
         return new Table (name + count++, attrs, colDomain, newKey, rows);
     } // project
@@ -179,14 +164,14 @@ public class Table
     } // select
 
     /************************************************************************************
+     * Ben Rotolo's code
      * Select the tuples satisfying the given key predicate (key = value).  Use an index
      * (Map) to retrieve the tuple with the given key value.
      *
      * @param keyVal  the given key value
      * @return  a table with the tuple satisfying the key predicate
      */
-    public Table select (KeyType keyVal)
-    {
+    public Table select (KeyType keyVal) {
         out.println ("RA> " + name + ".select (" + keyVal + ")");
 
         List <Comparable []> rows = new ArrayList <> ();
@@ -196,24 +181,22 @@ public class Table
         */
         int index;
        
-        for(Comparable[] t : tuples)
-        {
-            for(index =0; index < t.length; index++)
-            {
+        for(Comparable[] t : tuples) {
+        	
+            for(index =0; index < t.length; index++) {
                 
                 KeyType tempKey = new KeyType(t[index].toString());
             
                 // For each element, make an equivalent KeyType, and use the 
                 // KeyType method .equals() to compare it to keyVal
-                
-                if(keyVal.equals(tempKey))
-                
+                if(keyVal.equals(tempKey) && rows.contains(tempKey) == false) {
                     rows.add(t);
-            }
-   
-        }          
+                } // if
+            
+            } // for
+            
+        } // for       
         
-
         return new Table (name + count++, attribute, domain, key, rows);
     } // select
 
@@ -238,6 +221,7 @@ public class Table
     } // union
 
     /************************************************************************************
+     * Jeff Cardinal's code
      * Take the difference of this table and table2.  Check that the two tables are
      * compatible.
      *
@@ -253,8 +237,43 @@ public class Table
 
         List <Comparable []> rows = new ArrayList <> ();
 
-        //  T O   B E   I M P L E M E N T E D 
-
+        //For every tuple in table1 go through and check for matches in table2
+        for (Comparable[] tuple : this.tuples) {
+        	
+        	Comparable[] addition = new Comparable[tuple.length]; //Temp array for row addition
+        	Boolean flag = TRUE; //If TRUE, add the row
+        	
+        	//Parse all tuples and add them into an ArrayList for later processing
+        	ArrayList<String> tempRow = new ArrayList<String>();
+    		for (int j=0; j<tuple.length; j++) {
+    			tempRow.add(tuple[j].toString());
+        	} // for
+    		
+    		//For each tuple in table2 parse the fields and change them to String objects,
+    		//add them to a temporary Comparable[] and check for matches in table1
+        	for (Comparable[] tuple2 : table2.tuples) {
+        		
+        		ArrayList<String> tempRow2 = new ArrayList<String>();
+        		for (int j=0; j<tuple2.length; j++) {
+        			tempRow2.add(tuple2[j].toString()); //Add in each field with .toString()
+            	} // for
+        	
+        		//Checks for matches. If there's a match we set the flag to be FALSE 
+        		//and we won't add it into the final output table
+        		if (tempRow.equals(tempRow2)) { 
+        			flag = FALSE;
+        		} // if
+        		
+        	} // for
+        	
+        	//If flag remains TRUE, add the row into the table
+        	if (flag == TRUE) {
+    			addition = tuple;
+    			rows.add(addition);	
+    		} // if
+        	
+        } // for
+        
         return new Table (name + count++, attribute, domain, key, rows);
     } // minus
 
@@ -281,12 +300,14 @@ public class Table
         List <Comparable []> rows = new ArrayList <> ();
 
         //  T O   B E   I M P L E M E N T E D 
+        
 
         return new Table (name + count++, ArrayUtil.concat (attribute, table2.attribute),
                                           ArrayUtil.concat (domain, table2.domain), key, rows);
     } // join
 
     /************************************************************************************
+     * Layton Hayes's code
      * Join this table and table2 by performing an "natural join".  Tuples from both tables
      * are compared requiring common attributes to be equal.  The duplicate column is also
      * eliminated.
@@ -422,7 +443,7 @@ public class Table
         if (typeCheck (tup)) {
             tuples.add (tup);
             Comparable [] keyVal = new Comparable [key.length];
-            int []        cols   = match (key);
+            int [] cols = match (key);
             for (int j = 0; j < keyVal.length; j++) keyVal [j] = tup [cols [j]];
             index.put (new KeyType (keyVal), tup);
             return true;
@@ -584,6 +605,7 @@ public class Table
     } // extract
 
     /************************************************************************************
+     * Layton, Ben Rotolo, and Jeff Cardinal's code
      * Check the size of the tuple (number of elements in list) as well as the type of
      * each value to ensure it is from the right domain. 
      *
@@ -594,24 +616,21 @@ public class Table
     private boolean typeCheck (Comparable [] t)
     { 
 
-        for(Comparable tup : t) // for each item in t
-        {
-            if(t.size().equals this.size) // first check relative size of tuples
-            {
-                flag = false;
-                break;
-            }
+    	 if(t.length != this.domain.length) // first check relative size of tuples
+         {
+             return false;
+             //break;
+         }
+    	
+    	 for(int i = 0; i < t.length; i++){
+    		 if(!t[i].getClass().equals(this.domain[i])){
+    			 return false;
+    			 //break
+    		 }
+    	 }
 
-        }
-
-        Boolean flag = true;
-        if (flag = true) {
-            return true;
-        }
-        else (flag = false) {
-            return false;
-        }
-    } // typeCheck
+        return true;
+    }
 
     /************************************************************************************
      * Find the classes in the "java.lang" package with given names.
@@ -653,4 +672,3 @@ public class Table
     } // extractDom
 
 } // Table class
-
