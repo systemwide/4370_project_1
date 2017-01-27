@@ -372,27 +372,34 @@ public class Table
         String [] t_attrs = attributes1.split (" ");
         String [] u_attrs = attributes2.split (" ");
         
+	//set of attributes from table1
         Set<String> my_attrs = new HashSet<>();
         for(String str : this.attribute) my_attrs.add(str);
         
+	//set of attributes to join on from table1
         Set<String> t1 = new HashSet<>();
         for(String str : t_attrs) t1.add(str);
         
+	//set of attributes to join on from table2
         Set<String> t2 = new HashSet<>();
         for(String str : u_attrs) t2.add(str);
         
+	//map to store values for attributes to join on
         Map<String, Comparable> map = new HashMap<>();
 
+	//rows for new table
         List <Comparable []> rows = new ArrayList <> ();
-        boolean found;
-
+        
+	boolean found;
         Comparable[] match = new Comparable[0];
         Comparable[] merge;
         
+	//for every row in table1
 	for (Comparable[] tuple : this.tuples) {
+		
 		found = false;
 		
-		for (int i = 0; i < this.attribute.length; i++) {
+		for (int i = 0; i < this.attribute.length; i++) {//store values from this row to join on
 			if(t1.contains(this.attribute[i])){
 				for(int j = 0; j < t_attrs.length; j++){
 					if(t_attrs[j].equals(this.attribute[i])) map.put(u_attrs[j], tuple[i]);
@@ -400,52 +407,54 @@ public class Table
 			}
 		}
 		
-		for (Comparable[] tuple2 : table2.tuples) {
+		for (Comparable[] tuple2 : table2.tuples) {// search for a matching row in table2
 			found = true;
 			for (int i = 0; i < tuple2.length; i++) {
 				if (t2.contains(table2.attribute[i]) && !tuple2[i].equals(map.get(table2.attribute[i]))) {
 					found = false;
-					match = tuple2;
-       			} // if 
+       				} // if 
 			} // for
 			
-			if (found) { 
+			if (found) { //if a match is found, store it and stop searching
 				match = tuple2;
 				break; 
-            } // if	
+            		} // if	
 		} // for
 			
+		//if a match is found, join the data from the matching rows and add it to the new table.
 		if (found) {
 			merge = new Comparable[tuple.length + match.length - t_attrs.length];
 			
 			int index = 0;
-            for(int i = 0; i < tuple.length; i++){
-                    merge[index] = tuple[i];
-                    index++;
-            } // for
-            for(int i = 0; i < match.length; i++){
-            	if(!t2.contains(table2.attribute[i])){ 
-            		merge[index] = match[i];
-            		index++;
-            	}
-            } // for
-            rows.add(merge);
-          } // if
+           		for(int i = 0; i < tuple.length; i++){
+                    		merge[index] = tuple[i];
+                    		index++;
+            		} // for
+            		for(int i = 0; i < match.length; i++){
+            			if(!t2.contains(table2.attribute[i])){ 
+            				merge[index] = match[i];
+            				index++;
+            			}
+         		   } // for
+            		rows.add(merge);
+          	} // if
 	} // for
               
+	      
+	//building new attribute and domain arrays for new table.
        String[] new_attribute = new String[this.attribute.length + match.length - t_attrs.length];
        Class[] new_domain = new Class[this.attribute.length + match.length - t_attrs.length];
        
        int index = 0;
-       for(int i = 0; i < this.attribute.length; i++){
+       for(int i = 0; i < this.attribute.length; i++){//add attributes and domains from table1
               new_attribute[index] = this.attribute[i];
               new_domain[index] = this.domain[i];
               index++;
        }
-       for(int i = 0; i < table2.attribute.length; i++){
+       for(int i = 0; i < table2.attribute.length; i++){//add attributes and domains from table two, excluding the ones we're joining on
               if(!t2.contains(table2.attribute[i])){
             	  
-            	  if(my_attrs.contains(table2.attribute[i])){ 
+            	  if(my_attrs.contains(table2.attribute[i])){ //if there is an identical attribute in table1, append a "2"
             		  new_attribute[index] = table2.attribute[i] + "2";
             		  
                   } else {
@@ -459,6 +468,7 @@ public class Table
               } // if
        } // for
 	
+	//replaced array concatinations with our generated new_attribute and new_domain arrays.
        return new Table (name + count++, new_attribute, new_domain, key, rows);
     } // join
 
@@ -491,22 +501,23 @@ public class Table
             }
         }
 
-
+	//find shorter and longer tables, because length of result will be at most length of shorter
         Table shorter = (this.tuples.size() < table2.tuples.size()) ? this : table2;
         Table longer = (this.tuples.size() >= table2.tuples.size()) ? this : table2;
 
-        Map<String, Comparable> overlapMap;
+        Map<String, Comparable> overlapMap;//map to store the values of overlapping attributes, for matching.
 
         int index;
-        for(Comparable[] tuple : shorter.tuples) {
+        for(Comparable[] tuple : shorter.tuples) {//iterate through all rows
 
             overlapMap = new HashMap<>(overlap.size());
             for (int i = 0; i < this.attribute.length; i++) {//store overlapping attributes
                 if(overlap.contains(this.attribute[i])) overlapMap.put(this.attribute[i], tuple[i]);
             }
+	    
             Comparable[] tuple2 = new Comparable[0];
             Boolean found = false;
-            for (Comparable[] tuple_2 : longer.tuples) {
+            for (Comparable[] tuple_2 : longer.tuples) {// search for a matching row in the other table
                 found = true;
                 for (int i = 0; i < tuple_2.length; i++) {
                     //for each attribute, if there is an overlap but the values don't match, then this isn't a match.
@@ -519,8 +530,9 @@ public class Table
             }
 
             //if this tuple doesn't have a match in the other table, don't include it in the joined table.
-            if(!found) break;
+            if(!found) continue;
 
+	    //build new row from matching rows in the tables
             Comparable[] addition = new Comparable[attrs.size()];
             index = 0;
             for (int i = 0; i < tuple.length; i++) {
@@ -531,6 +543,7 @@ public class Table
                 addition[index] = tuple2[i];
                 index++;
             }
+	    //add the row to the new table
             rows.add(addition);
         }
 
@@ -764,17 +777,15 @@ public class Table
          if(t.length != this.domain.length) // first check relative size of tuples
          {
              return false;
-             //break;
          }
         
-         for(int i = 0; i < t.length; i++){
+         for(int i = 0; i < t.length; i++){//compare the class of each element to the corresponding domain in the table
              if(!t[i].getClass().equals(this.domain[i])){
                  return false;
-                 //break
              }
          }
 
-        return true;
+        return true; //if everything is on the up and up return true.
     }
 
     /************************************************************************************
