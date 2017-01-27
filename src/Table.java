@@ -1,3 +1,4 @@
+
 /****************************************************************************************
  * @file  Table.java
  *
@@ -123,12 +124,12 @@ public class Table
     //----------------------------------------------------------------------------------
 
     /************************************************************************************
-     * Zach Saucier's code
      * Project the tuples onto a lower dimension by keeping only the given attributes.
      * Check whether the original key is included in the projection.
      *
      * #usage movie.project ("title year studioNo")
      *
+     * @author Layton Hayes
      * @param attributes  the attributes to project onto
      * @return  a table of projected tuples
      */
@@ -141,43 +142,21 @@ public class Table
 
         List <Comparable []> rows = new ArrayList <> ();
         
-        // Our implementation
-        
-        // Get the column indexes of the given attributes
-        int[] attrsIndexes = new int[attrs.length];
-        int i; 
-        for (i = 0; i < attrs.length; i++) {
-        	attrsIndexes[i] = col(attrs[i]);
-        }
-        
-        // Loop through every row
-        for(Comparable[] t : tuples) {
-        	
-        	Comparable[] addition = new Comparable[attrs.length];
-        	int count = 0;
-            
-        	// Loop throw each column of the row
-            for(i = 0; i < t.length; i++) {
-            	
-            	// See if it is one of the attributes specified
-            	boolean isInAttrs = false;
-            	for(int j = 0; j < attrs.length; j++) {
-            		if(i == j) {
-            			isInAttrs = true;
-            		}
-            	}
-            	
-            	// Add it if it is one of the attributes specified
-            	if(isInAttrs) {
-            		addition[count++] = t[i];
-            	}
-            
-            } // for
-            
-            // Add the modified row
+      //Our code
+        int index;
+        for (Comparable[] tuple : this.tuples) {
+            Comparable[] addition = new Comparable[attrs.length];
+            index = 0;
+            for (int i = 0; i < this.attribute.length; i++) {
+                for (String atr : attrs) {
+                    if(atr.equals(attribute[i])){
+                        addition[index] = tuple[i];
+                        index++;
+                    }
+                }
+            }
             rows.add(addition);
-            
-        } // for       
+        }
 
         return new Table (name + count++, attrs, colDomain, newKey, rows);
     } // project
@@ -200,10 +179,10 @@ public class Table
     } // select
 
     /************************************************************************************
-     * Ben Rotolo's code
      * Select the tuples satisfying the given key predicate (key = value).  Use an index
      * (Map) to retrieve the tuple with the given key value.
      *
+     * @author Ben Rotolo
      * @param keyVal  the given key value
      * @return  a table with the tuple satisfying the key predicate
      */
@@ -237,11 +216,11 @@ public class Table
     } // select
 
     /************************************************************************************
-     * Zach Saucier's code
      * Union this table and table2.  Check that the two tables are compatible.
      *
      * #usage movie.union (show)
      *
+     * @author Zach Saucier
      * @param table2  the rhs table in the union operation
      * @return  a table representing the union
      */
@@ -295,12 +274,12 @@ public class Table
     } // union
 
     /************************************************************************************
-     * Jeff Cardinal's code
      * Take the difference of this table and table2.  Check that the two tables are
      * compatible.
      *
      * #usage movie.minus (show)
      *
+     * @author Jeff Cardinal
      * @param table2  The rhs table in the minus operation
      * @return  a table representing the difference
      */
@@ -352,13 +331,13 @@ public class Table
     } // minus
 
     /************************************************************************************
-     * Layton Hayes's and Jeff Cardinal's code
      * Join this table and table2 by performing an "equi-join".  Tuples from both tables
      * are compared requiring attributes1 to equal attributes2.  Disambiguate attribute
      * names by append "2" to the end of any duplicate attribute name.
      *
      * #usage movie.join ("studioNo", "name", studio)
      *
+     * @author Layton Hayes and Jeff Cardinal
      * @param attribute1  the attributes of this table to be compared (Foreign Key)
      * @param attribute2  the attributes of table2 to be compared (Primary Key)
      * @param table2      the rhs table in the join operation
@@ -366,110 +345,130 @@ public class Table
      */
     public Table join (String attributes1, String attributes2, Table table2)
     {
-        out.println ("RA> " + name + ".join (" + attributes1 + ", " + attributes2 + ", "
-                                               + table2.name + ")");
-
         String [] t_attrs = attributes1.split (" ");
         String [] u_attrs = attributes2.split (" ");
         
+        //set of attributes from table1
         Set<String> my_attrs = new HashSet<>();
         for(String str : this.attribute) my_attrs.add(str);
         
+        //set of attributes to join on from table1
         Set<String> t1 = new HashSet<>();
         for(String str : t_attrs) t1.add(str);
         
+        //set of attributes to join on from table2
         Set<String> t2 = new HashSet<>();
         for(String str : u_attrs) t2.add(str);
         
+        //map to store values for attributes to join on
         Map<String, Comparable> map = new HashMap<>();
 
+        //rows for new table
         List <Comparable []> rows = new ArrayList <> ();
+        
         boolean found;
-
         Comparable[] match = new Comparable[0];
         Comparable[] merge;
         
-	for (Comparable[] tuple : this.tuples) {
-		found = false;
-		
-		for (int i = 0; i < this.attribute.length; i++) {
-			if(t1.contains(this.attribute[i])){
-				for(int j = 0; j < t_attrs.length; j++){
-					if(t_attrs[j].equals(this.attribute[i])) map.put(u_attrs[j], tuple[i]);
+        //for every row in table1
+		for (Comparable[] tuple : this.tuples) {
+
+			found = false;
+
+			for (int i = 0; i < this.attribute.length; i++) {// store values
+																// from this row
+																// to join on
+				if (t1.contains(this.attribute[i])) {
+					for (int j = 0; j < t_attrs.length; j++) {
+						if (t_attrs[j].equals(this.attribute[i]))
+							map.put(u_attrs[j], tuple[i]);
+					}
 				}
 			}
-		}
-		
-		for (Comparable[] tuple2 : table2.tuples) {
-			found = true;
-			for (int i = 0; i < tuple2.length; i++) {
-				if (t2.contains(table2.attribute[i]) && !tuple2[i].equals(map.get(table2.attribute[i]))) {
-					found = false;
+
+			for (Comparable[] tuple2 : table2.tuples) {// search for a matching
+														// row in table2
+				found = true;
+				for (int i = 0; i < tuple2.length; i++) {
+					if (t2.contains(table2.attribute[i]) && !tuple2[i].equals(map.get(table2.attribute[i]))) {
+						found = false;
+					} // if
+				} // for
+
+				if (found) { // if a match is found, store it and stop searching
 					match = tuple2;
-       			} // if 
+					break;
+				} // if
 			} // for
-			
-			if (found) { 
-				match = tuple2;
-				break; 
-            } // if	
+
+			// if a match is found, join the data from the matching rows and add
+			// it to the new table.
+			if (found) {
+				merge = new Comparable[tuple.length + match.length - t_attrs.length];
+
+				int index = 0;
+				for (int i = 0; i < tuple.length; i++) {
+					merge[index] = tuple[i];
+					index++;
+				} // for
+				for (int i = 0; i < match.length; i++) {
+					if (!t2.contains(table2.attribute[i])) {
+						merge[index] = match[i];
+						index++;
+					}
+				} // for
+				rows.add(merge);
+			} // if
 		} // for
-			
-		if (found) {
-			merge = new Comparable[tuple.length + match.length - t_attrs.length];
-			
-			int index = 0;
-            for(int i = 0; i < tuple.length; i++){
-                    merge[index] = tuple[i];
-                    index++;
-            } // for
-            for(int i = 0; i < match.length; i++){
-            	if(!t2.contains(table2.attribute[i])){ 
-            		merge[index] = match[i];
-            		index++;
-            	}
-            } // for
-            rows.add(merge);
-          } // if
-	} // for
               
-       String[] new_attribute = new String[this.attribute.length + match.length - t_attrs.length];
-       Class[] new_domain = new Class[this.attribute.length + match.length - t_attrs.length];
-       
-       int index = 0;
-       for(int i = 0; i < this.attribute.length; i++){
-              new_attribute[index] = this.attribute[i];
-              new_domain[index] = this.domain[i];
-              index++;
-       }
-       for(int i = 0; i < table2.attribute.length; i++){
-              if(!t2.contains(table2.attribute[i])){
-            	  
-            	  if(my_attrs.contains(table2.attribute[i])){ 
-            		  new_attribute[index] = table2.attribute[i] + "2";
-            		  
-                  } else {
-                	  new_attribute[index] = table2.attribute[i];
-                  } // if
+		// building new attribute and domain arrays for new table.
+		String[] new_attribute = new String[this.attribute.length + match.length - t_attrs.length];
+		Class[] new_domain = new Class[this.attribute.length + match.length - t_attrs.length];
 
-                  new_domain[index] = table2.domain[i];
+		int index = 0;
+		for (int i = 0; i < this.attribute.length; i++) {// add attributes and
+															// domains from
+															// table1
+			new_attribute[index] = this.attribute[i];
+			new_domain[index] = this.domain[i];
+			index++;
+		}
+		for (int i = 0; i < table2.attribute.length; i++) {// add attributes and
+															// domains from
+															// table two,
+															// excluding the
+															// ones we're
+															// joining on
+			if (!t2.contains(table2.attribute[i])) {
 
-                  
-                  index++;
-              } // if
-       } // for
-	
-       return new Table (name + count++, new_attribute, new_domain, key, rows);
+				if (my_attrs.contains(table2.attribute[i])) { // if there is an
+																// identical
+																// attribute in
+																// table1,
+																// append a "2"
+					new_attribute[index] = table2.attribute[i] + "2";
+
+				} else {
+					new_attribute[index] = table2.attribute[i];
+				} // if
+
+				new_domain[index] = table2.domain[i];
+
+				index++;
+			} // if
+		} // for
+
+        return new Table(name + count++, new_attribute, new_domain, key, rows);
     } // join
 
     /************************************************************************************
-     * Layton Hayes's code
      * Join this table and table2 by performing an "natural join".  Tuples from both tables
      * are compared requiring common attributes to be equal.  The duplicate column is also
      * eliminated.
      *
      * #usage movieStar.join (starsIn)
      *
+     * @author Layton Hayes
      * @param table2  the rhs table in the join operation
      * @return  a table with tuples satisfying the equality predicate
      */
@@ -750,10 +749,10 @@ public class Table
     } // extract
 
     /************************************************************************************
-     * Layton Hayes, Ben Rotolo, and Jeff Cardinal's code
      * Check the size of the tuple (number of elements in list) as well as the type of
      * each value to ensure it is from the right domain. 
      *
+     * @author Layton Hayes, Ben Rotolo, and Jeff Cardinal
      * @param t  the tuple as a list of attribute values
      * @return  whether the tuple has the right size and values that comply
      *          with the given domains

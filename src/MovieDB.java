@@ -106,6 +106,13 @@ class MovieDB
         out.println ("Testing made up terms");
         Table t_project2 = movie.project ("made up terms");
         t_project2.print ();
+        
+        //--------------------- project: no arguments
+        
+        out.println ("Testing no terms");
+        Table t_project3 = movie.project ("");
+        t_project3.print ();
+
 
         //--------------------- select: equals, &&
 
@@ -175,4 +182,3 @@ class MovieDB
     } // main
 
 } // MovieDB class
-

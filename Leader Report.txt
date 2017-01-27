@@ -1,0 +1,26 @@
+Division of labor:
+
+Zach Saucier did:
+
+- The union operation
+- UML generation
+- Made sure the team followed all project requirements
+- Generated the Javadoc
+- Helped clean up code formatting
+
+Layton Hayes did:
+
+- Work on the Equi join operation
+- The natural join operation
+- Work on the typeCheck function
+- The project operation
+
+Jeff Cardinal did:
+
+- Work on the typeCheck function
+- The minus operation
+- Work on the equi join operation
+
+Ben Rotolo did:
+- The select operation
+- Work on the typeCheck function
