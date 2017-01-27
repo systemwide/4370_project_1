@@ -1,8 +1,11 @@
 # 4370_project_1
 
 Team name: Team Potato
+
 Authors: Zach Saucier, Layton Hayes, Jeff Cardinal, Ben Rotolo
+
 Class: Databases with Dr. Arpinar, UGA, Spring 2017
+
 Purpose: To learn more about queries by implementing basic 
 	query functions in Java.
 ______________________________________________________________
