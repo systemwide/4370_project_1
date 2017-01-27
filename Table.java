@@ -364,6 +364,18 @@ public class Table
      * @param table2      the rhs table in the join operation
      * @return  a table with tuples satisfying the equality predicate
      */
+    /************************************************************************************
+     * Join this table and table2 by performing an "equi-join".  Tuples from both tables
+     * are compared requiring attributes1 to equal attributes2.  Disambiguate attribute
+     * names by appending "2" to the end of any duplicate attribute name.
+     *
+     * #usage movie.join ("studioNo", "name", studio)
+     *
+     * @param attribute1  the attributes of this table to be compared (Foreign Key)
+     * @param attribute2  the attributes of table2 to be compared (Primary Key)
+     * @param table2      the rhs table in the join operation
+     * @return  a table with tuples satisfying the equality predicate
+     */
     public Table join (String attributes1, String attributes2, Table table2)
     {
         out.println ("RA> " + name + ".join (" + attributes1 + ", " + attributes2 + ", "
@@ -371,13 +383,87 @@ public class Table
 
         String [] t_attrs = attributes1.split (" ");
         String [] u_attrs = attributes2.split (" ");
+        
+        Set<String> my_attrs = new HashSet<>();
+        for(String str : this.attribute) my_attrs.add(str);
+        
+        Set<String> t1 = new HashSet<>();
+        for(String str : t_attrs) t1.add(str);
+        
+        Set<String> t2 = new HashSet<>();
+        for(String str : u_attrs) t2.add(str);
+        
+        Map<String, Comparable> map = new HashMap<>();
 
         List <Comparable []> rows = new ArrayList <> ();
+        boolean found;
 
-        // TO BE IMPLEMENTED
+        Comparable[] match = new Comparable[0];
+        Comparable[] merge;
+        
+	for (Comparable[] tuple : this.tuples) {
+		found = false;
+		
+		for (int i = 0; i < t_attrs.length; i++) {
+			if(t1.contains(t_attrs[i])) map.put(u_attrs[i], tuple[i]);
+		}
+		
+		for (Comparable[] tuple2 : table2.tuples) {
+			found = true;
+			for (int i = 0; i < tuple2.length; i++) {
+				if (t2.contains(table2.attribute[i]) && !tuple2[i].equals(map.get(table2.attribute[i]))) {
+					found = false;
+					match = tuple2;
+					
+					System.out.println(match);
+       			} // if 
+			
+			} // for
+			
+			if (found) { 
+                            match = tuple2;
+                            break; 
+                     }	
+				
+		} // for
+			
+		if (found) {
+                     merge = new Comparable[tuple.length + match.length - t_attrs.length];
+			int index = 0;
+                     for(int i = 0; i < tuple.length; i++){
+                            merge[index] = tuple[i];
+                            index++;
+                     }
+                     for(int i = 0; i < match.length; i++){
+                            if(!t2.contains(table2.attribute)) merge[index] = match[i];
+                            index++;
+                     }
+		       
+                     rows.add(merge);
+              }
+			
+	} // for
+              
+       String[] new_attribute = String[tuple.length + match.length - t_attrs.length];
+       Class[] new_domain = Class[tuple.length + match.length - t_attrs.length];
+       
+       int index = 0;
+       for(int i = 0; i < this.attribute.length; i++){
+              new_attribute[index] = this.attribute[i];
+              new_domain[index] = this.domain[i];
+              index++;
+       }
+       for(int i = 0; i < table2.attribute.length; i++){
+              if(!t2.contains(table2.attribute)){
+                     if(my_attrs.contains(table2.attribute[i])) new_attribute[index] = table2.attribute[i] + "2";
+                     else new_attribute[index] = table2.attribute[i];
 
-        return new Table (name + count++, ArrayUtil.concat (attribute, table2.attribute),
-                                          ArrayUtil.concat (domain, table2.domain), key, rows);
+                     new_domain[index] = table2.domain[i];
+                     index++;
+              }
+       }
+	
+       return new Table (name + count++, new_attribute, new_domain, key, rows);
     } // join
 
     /************************************************************************************
