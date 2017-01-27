@@ -1,4 +1,3 @@
-
 /****************************************************************************************
  * @file  Table.java
  *
@@ -353,21 +352,10 @@ public class Table
     } // minus
 
     /************************************************************************************
+     * Layton Hayes's and Jeff Cardinal's code
      * Join this table and table2 by performing an "equi-join".  Tuples from both tables
      * are compared requiring attributes1 to equal attributes2.  Disambiguate attribute
      * names by append "2" to the end of any duplicate attribute name.
-     *
-     * #usage movie.join ("studioNo", "name", studio)
-     *
-     * @param attribute1  the attributes of this table to be compared (Foreign Key)
-     * @param attribute2  the attributes of table2 to be compared (Primary Key)
-     * @param table2      the rhs table in the join operation
-     * @return  a table with tuples satisfying the equality predicate
-     */
-    /************************************************************************************
-     * Join this table and table2 by performing an "equi-join".  Tuples from both tables
-     * are compared requiring attributes1 to equal attributes2.  Disambiguate attribute
-     * names by appending "2" to the end of any duplicate attribute name.
      *
      * #usage movie.join ("studioNo", "name", studio)
      *
@@ -404,8 +392,12 @@ public class Table
 	for (Comparable[] tuple : this.tuples) {
 		found = false;
 		
-		for (int i = 0; i < t_attrs.length; i++) {
-			if(t1.contains(t_attrs[i])) map.put(u_attrs[i], tuple[i]);
+		for (int i = 0; i < this.attribute.length; i++) {
+			if(t1.contains(this.attribute[i])){
+				for(int j = 0; j < t_attrs.length; j++){
+					if(t_attrs[j].equals(this.attribute[i])) map.put(u_attrs[j], tuple[i]);
+				}
+			}
 		}
 		
 		for (Comparable[] tuple2 : table2.tuples) {
@@ -414,38 +406,35 @@ public class Table
 				if (t2.contains(table2.attribute[i]) && !tuple2[i].equals(map.get(table2.attribute[i]))) {
 					found = false;
 					match = tuple2;
-					
-					System.out.println(match);
        			} // if 
-			
 			} // for
 			
 			if (found) { 
-                            match = tuple2;
-                            break; 
-                     }	
-				
+				match = tuple2;
+				break; 
+            } // if	
 		} // for
 			
 		if (found) {
-                     merge = new Comparable[tuple.length + match.length - t_attrs.length];
-			int index = 0;
-                     for(int i = 0; i < tuple.length; i++){
-                            merge[index] = tuple[i];
-                            index++;
-                     }
-                     for(int i = 0; i < match.length; i++){
-                            if(!t2.contains(table2.attribute)) merge[index] = match[i];
-                            index++;
-                     }
-		       
-                     rows.add(merge);
-              }
+			merge = new Comparable[tuple.length + match.length - t_attrs.length];
 			
+			int index = 0;
+            for(int i = 0; i < tuple.length; i++){
+                    merge[index] = tuple[i];
+                    index++;
+            } // for
+            for(int i = 0; i < match.length; i++){
+            	if(!t2.contains(table2.attribute[i])){ 
+            		merge[index] = match[i];
+            		index++;
+            	}
+            } // for
+            rows.add(merge);
+          } // if
 	} // for
               
-       String[] new_attribute = String[tuple.length + match.length - t_attrs.length];
-       Class[] new_domain = Class[tuple.length + match.length - t_attrs.length];
+       String[] new_attribute = new String[this.attribute.length + match.length - t_attrs.length];
+       Class[] new_domain = new Class[this.attribute.length + match.length - t_attrs.length];
        
        int index = 0;
        for(int i = 0; i < this.attribute.length; i++){
@@ -454,14 +443,21 @@ public class Table
               index++;
        }
        for(int i = 0; i < table2.attribute.length; i++){
-              if(!t2.contains(table2.attribute)){
-                     if(my_attrs.contains(table2.attribute[i])) new_attribute[index] = table2.attribute[i] + "2";
-                     else new_attribute[index] = table2.attribute[i];
+              if(!t2.contains(table2.attribute[i])){
+            	  
+            	  if(my_attrs.contains(table2.attribute[i])){ 
+            		  new_attribute[index] = table2.attribute[i] + "2";
+            		  
+                  } else {
+                	  new_attribute[index] = table2.attribute[i];
+                  } // if
 
-                     new_domain[index] = table2.domain[i];
-                     index++;
-              }
-       }
+                  new_domain[index] = table2.domain[i];
+
+                  
+                  index++;
+              } // if
+       } // for
 	
        return new Table (name + count++, new_attribute, new_domain, key, rows);
     } // join
