@@ -124,6 +124,7 @@ public class Table
     //----------------------------------------------------------------------------------
 
     /************************************************************************************
+     * Zach Saucier's code
      * Project the tuples onto a lower dimension by keeping only the given attributes.
      * Check whether the original key is included in the projection.
      *
@@ -140,8 +141,44 @@ public class Table
         String [] newKey    = (Arrays.asList (attrs).containsAll (Arrays.asList (key))) ? key : attrs;
 
         List <Comparable []> rows = new ArrayList <> ();
-
-        //  T O   B E   I M P L E M E N T E D 
+        
+        // Our implementation
+        
+        // Get the column indexes of the given attributes
+        int[] attrsIndexes = new int[attrs.length];
+        int i; 
+        for (i = 0; i < attrs.length; i++) {
+        	attrsIndexes[i] = col(attrs[i]);
+        }
+        
+        // Loop through every row
+        for(Comparable[] t : tuples) {
+        	
+        	Comparable[] addition = new Comparable[attrs.length];
+        	int count = 0;
+            
+        	// Loop throw each column of the row
+            for(i = 0; i < t.length; i++) {
+            	
+            	// See if it is one of the attributes specified
+            	boolean isInAttrs = false;
+            	for(int j = 0; j < attrs.length; j++) {
+            		if(i == j) {
+            			isInAttrs = true;
+            		}
+            	}
+            	
+            	// Add it if it is one of the attributes specified
+            	if(isInAttrs) {
+            		addition[count++] = t[i];
+            	}
+            
+            } // for
+            
+            // Add the modified row
+            rows.add(addition);
+            
+        } // for       
 
         return new Table (name + count++, attrs, colDomain, newKey, rows);
     } // project
@@ -183,7 +220,7 @@ public class Table
        
         for(Comparable[] t : tuples) {
             
-            for(index =0; index < t.length; index++) {
+            for(index = 0; index < t.length; index++) {
                 
                 KeyType tempKey = new KeyType(t[index].toString());
             
@@ -223,12 +260,11 @@ public class Table
         
         // Add values from the second table that don't match a tuple in this table
         for (Comparable[] tuple : table2.tuples) {
-            Comparable[] addition = new Comparable[tuple.length]; //Temp array for row addition
             Boolean flag = FALSE; //If FALSE, add the row
             
             //Parse all tuples and add them into an ArrayList for later processing
             ArrayList<String> tempRow = new ArrayList<String>();
-            for (int j=0; j<tuple.length; j++) {
+            for (int j = 0; j < tuple.length; j++) {
                 tempRow.add(tuple[j].toString());
             } // for
             
@@ -237,7 +273,7 @@ public class Table
             for (Comparable[] tuple2 : this.tuples) {
                 
                 ArrayList<String> tempRow2 = new ArrayList<String>();
-                for (int j=0; j<tuple2.length; j++) {
+                for (int j = 0; j < tuple2.length; j++) {
                     tempRow2.add(tuple2[j].toString()); //Add in each field with .toString()
                 } // for
             
@@ -251,8 +287,7 @@ public class Table
             
             //If flag remains TRUE, add the row into the table
             if (flag == FALSE) {
-                addition = tuple;
-                rows.add(addition); 
+                rows.add(tuple); 
             } // if
             
         } // for
@@ -285,7 +320,7 @@ public class Table
             
             //Parse all tuples and add them into an ArrayList for later processing
             ArrayList<String> tempRow = new ArrayList<String>();
-            for (int j=0; j<tuple.length; j++) {
+            for (int j = 0; j < tuple.length; j++) {
                 tempRow.add(tuple[j].toString());
             } // for
             
@@ -294,7 +329,7 @@ public class Table
             for (Comparable[] tuple2 : table2.tuples) {
                 
                 ArrayList<String> tempRow2 = new ArrayList<String>();
-                for (int j=0; j<tuple2.length; j++) {
+                for (int j = 0; j < tuple2.length; j++) {
                     tempRow2.add(tuple2[j].toString()); //Add in each field with .toString()
                 } // for
             
@@ -339,8 +374,7 @@ public class Table
 
         List <Comparable []> rows = new ArrayList <> ();
 
-        //  T O   B E   I M P L E M E N T E D 
-        
+        // TO BE IMPLEMENTED
 
         return new Table (name + count++, ArrayUtil.concat (attribute, table2.attribute),
                                           ArrayUtil.concat (domain, table2.domain), key, rows);
