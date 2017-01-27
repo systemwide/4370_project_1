@@ -423,29 +423,18 @@ public class Table
         Class[] domains = new Class[attrs.size()];
 
         index = 0;
-        boolean domainFound;
-        for (String attr : attrs) {
-            domainFound = false;
-            attributes[index] = attr;
-
-            //checking for domain in first table
-            for (int i = 0; i < this.attribute.length; i++) {
-                if(this.attribute[i].equals(attr)){
-                    domains[index] = this.domain[i];
-                    domainFound = true;
-                    break;
-                }
-            }
-            if(!domainFound) {
-                //if domain wasn't found in first table, then find it in second.
-                for (int i = 0; i < table2.attribute.length; i++) {
-                    if (table2.attribute[i].equals(attr)) {
-                        domains[index] = table2.domain[i];
-                        break;
-                    }
-                }
-            }
-            index++;
+        for(int i = 0; i < this.attribute.length; i++){//add attributes and domains from table1
+              attributes[index] = this.attribute[i];
+              domains[index] = this.domain[i];
+              index++;
+        }
+        //add attributes and domains from table2 that aren't already included from table1
+        for(int i = 0; i < table2.attribute.length && index < attributes.length; i++){
+              if(!overlap.contains(table2.attribute[i])){
+                     attributes[index] = table2.attribute[i];
+                     domains[index] = table2.domain[i];
+                     index++;
+              }
         }
         //our code
 
