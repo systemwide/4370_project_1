@@ -24,13 +24,13 @@ You can likely also compile using the `javac` command on the
 command line on the `MovieDB.java` file.
 
 
-The .java files can be found in the `src` directory.
-The UML .ucls file can also be found in `src`; the image can be
+- The .java files can be found in the `src` directory.
+- The UML .ucls file can also be found in `src`; the image can be
 	found in the `out\production\Project 1` directory.
-The generated class files can be found in the 
+- The generated class files can be found in the 
 	`out\production\Project 1` directory.
-The `store` directory is for the generated `.dbf` files, but
+- The `store` directory is for the generated `.dbf` files, but
 	there were errors in the original implementation that we
 	received and did not believe it was part of the project
 	to fix it.
-The Javadoc files are found in the `doc` directory.
+- The Javadoc files are found in the `doc` directory.
