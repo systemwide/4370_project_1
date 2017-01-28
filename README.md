@@ -28,8 +28,8 @@ command line on the `MovieDB.java` file.
 
 
 - The .java files can be found in the `src` directory.
-- The UML .ucls file can also be found in `src`; the image can be
-	found in the `out\production\Project 1` directory.
+- The UML .ucls file and image can also be found in `src`
+	directory.
 - The generated class files can be found in the 
 	`out\production\Project 1` directory.
 - The `store` directory is for the generated `.dbf` files, but
