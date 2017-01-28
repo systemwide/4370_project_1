@@ -183,10 +183,6 @@ class MovieDB
         Table t_join = movie.join ("studioName", "name", studio);
         t_join.print ();
 
-        //------------------- equi-join: movie JOIN studio ON 
-        out.println("Testing EquiJoin on disparate domain types");
-        Table bad_domain_join = movie.join("studioName", "presNo", studio);
-        bad_domain_join.print();
         
         //--------------------- natural join: movie JOIN studio
 
