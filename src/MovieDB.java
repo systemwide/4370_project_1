@@ -102,13 +102,19 @@ class MovieDB
         t_project.print ();
 
         //--------------------- project: non-existent arguments
-        
+        /**
+         *@author Ben Rotolo
+         *
+         */
         out.println ("Testing made up terms");
         Table t_project2 = movie.project ("made up terms");
         t_project2.print ();
         
         //--------------------- project: no arguments
-        
+        /**
+         *@author Ben Rotolo
+         *
+         */
         out.println ("Testing no terms");
         Table t_project3 = movie.project ("");
         t_project3.print ();
@@ -123,6 +129,10 @@ class MovieDB
         
         
         //--------------------- select: equals, ||
+        /**
+         *@author Ben Rotolo
+         *
+         */
         out.println ("Testing Select with .equals and || ");
         out.println ();
         Table t_select_or = movie.select (t -> t[movie.col("title")].equals ("Star_Wars") ||
@@ -130,6 +140,10 @@ class MovieDB
         t_select_or.print ();
         
         //--------------------- select: !equals
+        /**
+         *@author Ben Rotolo
+         *
+         */
         out.println ("Testing Select with !equals");
         out.println ();
         Table t_select_not = movie.select (t -> !t[movie.col("title")].equals ("Star_Wars"));
@@ -149,11 +163,19 @@ class MovieDB
         t_iselect.print ();
         
         //--------------------- select with blank key
+        /**
+         *@author Ben Rotolo
+         *
+         */
         out.println ("Select with a  ' ' for key...");
         Table t_iselect_blank = movieStar.select (new KeyType (" "));
         t_iselect_blank.print ();
         
-      //--------------------- select without args
+        //--------------------- select without args
+        /**
+         *@author Ben Rotolo
+         *
+         */
         out.println ("Select with out arguments...");
         Table t_iselect_no_arg = movieStar.select ();
         t_iselect_no_arg.print ();
@@ -166,7 +188,20 @@ class MovieDB
         t_union.print ();
         
         //--------------------- union: movie UNION cinema
+        /**
+         *@author Ben Rotolo
+         *
+         */
+        out.println("self-Union movie with movie");
+        Table t_union_self = movie.union(movie);
+        t_union_self.print();
+
         
+        //--------------------- union: movie UNION movie
+        /**
+         *@author Ben Rotolo
+         *
+         */
         out.println("self-Union movie with movie");
         Table t_union_self = movie.union(movie);
         t_union_self.print();
@@ -176,7 +211,17 @@ class MovieDB
         out.println ();
         Table t_minus = movie.minus (cinema);
         t_minus.print ();
+        
+        //--------------------- minus: movie MINUS movie
+        /**
+         *@author Ben Rotolo
+         *
+         */
+        out.println ("Movie minus self...");
+        Table self_minus = movie.minus (movie);
+        self_minus.print ();
 
+        
         //--------------------- equi-join: movie JOIN studio ON studioName = name
 
         out.println ();
@@ -189,6 +234,15 @@ class MovieDB
         out.println ();
         Table t_join2 = movie.join (cinema);
         t_join2.print ();
+        
+        //--------------------- natural join: join on self.
+        /**
+         *@author Ben Rotolo
+         *
+         */
+        out.println ("Movie join with movie");
+        Table self_join = movie.join (movie);
+        self_join.print ();
 
     } // main
 
