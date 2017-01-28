@@ -203,8 +203,8 @@ class MovieDB
          *
          */
         out.println("self-Union movie with movie");
-        Table t_union_self = movie.union(movie);
-        t_union_self.print();
+        Table t_union_self1 = movie.union(movie);
+        t_union_self1.print();
 
         //--------------------- minus: movie MINUS cinema
 
