@@ -147,6 +147,16 @@ class MovieDB
         out.println ();
         Table t_iselect = movieStar.select (new KeyType ("Harrison_Ford"));
         t_iselect.print ();
+        
+        //--------------------- select with blank key
+        out.println ("Select with a  ' ' for key...");
+        Table t_iselect_blank = movieStar.select (new KeyType (" "));
+        t_iselect_blank.print ();
+        
+      //--------------------- select without args
+        out.println ("Select with out arguments...");
+        Table t_iselect_no_arg = movieStar.select ();
+        t_iselect_no_arg.print ();
 
      
         //--------------------- union: movie UNION cinema
@@ -173,6 +183,11 @@ class MovieDB
         Table t_join = movie.join ("studioName", "name", studio);
         t_join.print ();
 
+        //------------------- equi-join: movie JOIN studio ON 
+        out.println("Testing EquiJoin on disparate domain types");
+        Table bad_domain_join = movie.join("studioName", "presNo", studio);
+        bad_domain_join.print();
+        
         //--------------------- natural join: movie JOIN studio
 
         out.println ();
