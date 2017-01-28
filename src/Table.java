@@ -214,6 +214,12 @@ public class Table
         
         return new Table (name + count++, attribute, domain, key, rows);
     } // select
+    
+    // Select with no arguments - should return the calling table.
+    public Table select()
+    {
+         return this;
+    }// select
 
     /************************************************************************************
      * Union this table and table2.  Check that the two tables are compatible.
